@@ -123,7 +123,7 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
 
   return (
     <PageLayout
-      pageTitle="Minimum Wage Geospatial Chart"
+      pageTitle="Final Visualization Project"
       description={description}
       showDescriptionTitle={false}
       generateChart={({ width }) => (
