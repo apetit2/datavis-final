@@ -1,0 +1,9 @@
+.clicked {
+  opacity: 0.2;
+  fill: black;
+}
+
+.state:hover {
+  opacity: 0.2;
+  fill: black;
+}
