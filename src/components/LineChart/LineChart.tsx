@@ -51,13 +51,22 @@ const filterData = <T extends CSVRow>(
   grouping: KeysMatching<T, string | undefined>,
   filter?: (row: T) => boolean,
   brushExtent?: [number, number],
-  x?: KeysMatching<T, number | undefined>
+  x?: KeysMatching<T, number | undefined>,
+  y?: KeysMatching<T, number | undefined>
 ) => {
   const lines: T[][] = [];
   let rowIndex = 0;
   // no great way to make this efficient
   data
     .filter((row) => {
+      if (
+        !x ||
+        (row[x] as unknown) === undefined ||
+        !y ||
+        (row[y] as unknown) === undefined
+      ) {
+        return false;
+      }
       if (brushExtent && x) {
         return (
           (filter === undefined || filter(row)) &&
@@ -127,12 +136,21 @@ export const LineChart = <T extends CSVRow>({
     [data, yValue]
   );
   const xRange = useMemo(
-    () => extent(data, xValue) as [number, number],
-    [data, xValue]
+    () =>
+      extent(
+        data.filter((row) => filter === undefined || filter(row)),
+        xValue
+      ) as [number, number],
+    [data, xValue, filter]
   );
+
   const focusXRange = useMemo(
-    () => extent(data, xValue) as [number, number],
-    [data, xValue]
+    () =>
+      extent(
+        data.filter((row) => filter === undefined || filter(row)),
+        xValue
+      ) as [number, number],
+    [data, xValue, filter]
   );
 
   const paddedHeight = useMemo(
@@ -221,8 +239,8 @@ export const LineChart = <T extends CSVRow>({
   }, [paddedWidth, brushedSectionHeight, brushRef, focusXScale]);
 
   const lines = useMemo(
-    () => filterData(data, grouping, filter, brushExtent, x),
-    [data, grouping, filter, brushExtent, x]
+    () => filterData(data, grouping, filter, brushExtent, x, y),
+    [data, grouping, filter, brushExtent, x, y]
   );
 
   const focusLines = useMemo(() => {

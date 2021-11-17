@@ -17,10 +17,15 @@ export interface MinimumWage extends CSVRow {
   depLaborCleanedHighValueTodayDollars?: number;
   footnote?: string;
   studio?: number;
+  studioPercentOfRent?: number;
   oneBedroom?: number;
+  oneBedroomPercentOfRent?: number;
   twoBedroom?: number;
+  twoBedroomPercentOfRent?: number;
   threeBedroom?: number;
+  threeBedroomPercentOfRent?: number;
   fourBedroom?: number;
+  fourBedroomPercentOfRent?: number;
   population?: number;
 }
 
@@ -58,6 +63,13 @@ export const MinimumWageCols = {
   twoBedroom: 'Average Two Bedroom Apartment Cost',
   threeBedroom: 'Average Three Bedroom Apartment Cost',
   fourBedroom: 'Average Four Bedroom Apartment Cost',
+  studioPercentOfRent: 'Average Studio Cost as a Percent of Rent',
+  oneBedroomPercentOfRent: 'Average One Bedroom Apartment as a Percent of Rent',
+  twoBedroomPercentOfRent: 'Average Two Bedroom Apartment as a Percent of Rent',
+  threeBedroomPercentOfRent:
+    'Average Three Bedroom Apartment as a Percent of Rent',
+  fourBedroomPercentOfRent:
+    'Average Four Bedroom Apartment as a Percent of Rent',
   population: 'Population',
 } as const;
 

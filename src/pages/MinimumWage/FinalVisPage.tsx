@@ -1,22 +1,31 @@
+// TODO: this needs to be broken down into many parts
+
 import {
   GeospatialChart,
   YearSelector,
 } from '../../components/GeospatialChart';
-import { Col, Divider, Row, Space, Typography } from 'antd';
+import { Button, Col, Divider, Row, Space, Switch, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { Constants } from './constants';
-import { MinimumWage } from '../../services/models/minimumWage';
+import {
+  MinimumWage,
+  MinimumWageCols,
+} from '../../services/models/minimumWage';
 import { PageLayout } from '../../layout/PageLayout';
 import { useFallback } from '../../hooks/useFallback';
 import { useIncrementYear } from '../../hooks/useIncrementYear';
-import { useMinimumWageQuery } from '../../services/hooks/useQuery';
+import {
+  useMinimumWageQuery,
+  useUSMapQuery,
+} from '../../services/hooks/useQuery';
 import { useMemo, useState } from 'react';
 import { currencyFormatter } from '../../util/currency';
-import { LineChart } from '../../components/LineChart';
+import { LineChart, LineChartAxes } from '../../components/LineChart';
 import { DSVParsedArray } from 'd3';
 import { ScatterPlot } from '../../components/ScatterPlot';
 import { convertStateToAbbreviation } from '../../util/convertStateToAbbreviation';
+import { KeysMatching } from '../../types/shared';
 
 export interface FinalVisPageProps {}
 
@@ -24,6 +33,12 @@ const { Text } = Typography;
 
 export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
   const { data, isError, isLoading } = useMinimumWageQuery();
+
+  const {
+    data: usMap,
+    isError: isUSMapError,
+    isLoading: isLoadingUSMap,
+  } = useUSMapQuery();
 
   const minYear = data?.[0].year || 1968;
   const maxYear = data?.[data.length - 1]?.year || 2020;
@@ -40,7 +55,15 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
   const [selectedYear, setSelectedYear] = useState(minYear);
   const [selectedScatterPlotYear, setSelectedScatterPlotYear] =
     useState(minScatterPlotYear);
-  const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedState, setSelectedState] = useState('all');
+
+  // line chart
+  const [lineGraphX, setLineGraphX] =
+    useState<KeysMatching<MinimumWage, number | undefined>>('year');
+  const [lineGraphY, setLineGraphY] = useState<
+    KeysMatching<MinimumWage, number | undefined>
+  >('effectiveMinWageTodayDollars');
+  const [isFocusable, setIsFocusable] = useState(false);
 
   const filteredData = useMemo(() => {
     return data?.filter(
@@ -48,7 +71,11 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
     ) as DSVParsedArray<MinimumWage> | undefined;
   }, [data, selectedScatterPlotYear]);
 
-  const { fallback } = useFallback<MinimumWage>(isLoading, isError, data);
+  const { fallback } = useFallback(
+    isLoading || isLoadingUSMap,
+    isError || isUSMapError,
+    Boolean(data && usMap)
+  );
 
   useIncrementYear(
     maxYear,
@@ -66,10 +93,10 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
     setSelectedScatterPlotYear
   );
 
-  const xAxisLabel = 'Two Bedroom Apartment Cost ($)';
+  const xAxisLabel = 'Two Bedroom Apartment Cost as a Percent of Earnings';
   const yAxisLabel = 'Minimum Wage ($/hour)';
 
-  if (fallback || !data || !filteredData) {
+  if (fallback || !data || !usMap || !filteredData) {
     return fallback;
   }
 
@@ -139,10 +166,46 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                 onChange={setSelectedYear}
               />
             </Col>
-            <Col style={{ textAlign: 'center', width: '50%' }}>
-              <Text strong style={{ fontSize: 24 }}>
-                {selectedState !== 'all' ? selectedState : 'All States'}
-              </Text>
+            <Col style={{ width: '50%' }}>
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <Space
+                  direction="horizontal"
+                  size="small"
+                  style={{
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    paddingLeft: '50%',
+                  }}
+                >
+                  <Text strong style={{ fontSize: 24 }}>
+                    {selectedState !== 'all' ? selectedState : 'All States'}
+                  </Text>
+                  <Button
+                    type="ghost"
+                    onClick={() => setSelectedState('all')}
+                    disabled={selectedState === 'all'}
+                  >
+                    Reset
+                  </Button>
+                  <Switch
+                    onChange={(val) => setIsFocusable(val)}
+                    checked={isFocusable}
+                  />
+                </Space>
+                <LineChartAxes<MinimumWage>
+                  selectedX={lineGraphX}
+                  selectedY={lineGraphY}
+                  onSelectX={setLineGraphX}
+                  onSelectY={setLineGraphY}
+                  data={data}
+                  labels={MinimumWageCols}
+                  style={{ paddingLeft: '25%', width: '100%' }}
+                />
+              </Space>
             </Col>
           </Row>
           <Row style={{ width }}>
@@ -151,11 +214,13 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                 width={width / 2}
                 height={400}
                 rows={data}
+                data={usMap}
                 timeField="year"
                 stateField="state"
                 colorRepresentation="effectiveMinWageTodayDollars"
                 chosenTimeField={selectedYear}
                 onClick={(_, state) => setSelectedState(state)}
+                chosenState={selectedState}
                 showLegend
                 renderToolTip={(state, minWage) => (
                   <Space direction="vertical">
@@ -174,13 +239,16 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                 height={400}
                 margin={{ top: 30, right: 30, bottom: 50, left: 0 }}
                 data={data}
-                xLabel="Year"
-                yLabel="Effective Minimum Wage ($)"
-                x="year"
-                y="effectiveMinWageTodayDollars"
+                xLabel={MinimumWageCols[lineGraphX]}
+                yLabel={MinimumWageCols[lineGraphY]}
+                x={lineGraphX}
+                y={lineGraphY}
+                focusable={isFocusable}
                 grouping="state"
                 cords={
-                  selectedState !== 'all'
+                  selectedState !== 'all' &&
+                  lineGraphX === 'year' &&
+                  lineGraphY === 'effectiveMinWageTodayDollars'
                     ? [
                         {
                           x: selectedYear,
@@ -224,26 +292,29 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
               <ScatterPlot<MinimumWage>
                 width={width}
                 height={400}
-                margin={{ top: 30, right: 30, bottom: 60, left: 0 }}
+                margin={{ top: 50, right: 30, bottom: 70, left: 0 }}
                 data={filteredData}
                 xLabel={xAxisLabel}
                 yLabel={yAxisLabel}
-                x="twoBedroom"
+                x="twoBedroomPercentOfRent"
                 y="stateMinWageTodayDollars"
                 color="state"
                 radius={12}
-                isXAxisDollarValue
                 isYAxisDollarValue
                 opacity="0.4"
                 circleText={(state) => convertStateToAbbreviation(state)}
-                renderToolTip={(x, y, state) => (
+                renderToolTip={(row, state) => (
                   <Space direction="vertical">
                     <Text style={{ color: 'white' }}>State: {state}</Text>
                     <Text style={{ color: 'white' }}>
-                      Rent Cost: {currencyFormatter.format(x)}
+                      Rent Cost:{' '}
+                      {currencyFormatter.format(row?.twoBedroom ?? 0)}
                     </Text>
                     <Text style={{ color: 'white' }}>
-                      Effective Minimum Wage: {currencyFormatter.format(y)}
+                      Effective Minimum Wage:{' '}
+                      {currencyFormatter.format(
+                        row?.effectiveMinWageTodayDollars ?? 0
+                      )}
                     </Text>
                   </Space>
                 )}

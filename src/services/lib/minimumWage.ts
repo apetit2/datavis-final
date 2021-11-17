@@ -75,13 +75,33 @@ const merge = (
     return {
       ...minWage,
       studio: accountForInflation(minWage.cpiAverage!, rent.studio!),
+      studioPercentOfRent:
+        (accountForInflation(minWage.cpiAverage!, rent.studio!) /
+          (8 * minWage.effectiveMinWageTodayDollars! * 30)) *
+        100,
       oneBedroom: accountForInflation(minWage.cpiAverage!, rent.oneBedroom!),
+      oneBedroomPercentOfRent:
+        (accountForInflation(minWage.cpiAverage!, rent.oneBedroom!) /
+          (8 * minWage.effectiveMinWageTodayDollars! * 30)) *
+        100,
       twoBedroom: accountForInflation(minWage.cpiAverage!, rent.twoBedroom!),
+      twoBedroomPercentOfRent:
+        (accountForInflation(minWage.cpiAverage!, rent.twoBedroom!) /
+          (8 * minWage.effectiveMinWageTodayDollars! * 30)) *
+        100,
       threeBedroom: accountForInflation(
         minWage.cpiAverage!,
         rent.threeBedroom!
       ),
+      threeBedroomPercentOfRent:
+        (accountForInflation(minWage.cpiAverage!, rent.threeBedroom!) /
+          (8 * minWage.effectiveMinWageTodayDollars! * 30)) *
+        100,
       fourBedroom: accountForInflation(minWage.cpiAverage!, rent.fourBedroom!),
+      fourBedroomPercentOfRent:
+        (accountForInflation(minWage.cpiAverage!, rent.fourBedroom!) /
+          (8 * minWage.effectiveMinWageTodayDollars! * 30)) *
+        100,
       population: rent.population,
     } as MinimumWage;
   });

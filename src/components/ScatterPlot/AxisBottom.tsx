@@ -5,6 +5,7 @@ export interface AxisBottom {
   xScale: ScaleLinear<number, number, never>;
   yScale: ScaleLinear<number, number, never>;
   width: number;
+  height: number;
   tickOffset?: number;
   isDollarValue?: boolean;
 }
@@ -13,6 +14,7 @@ export const AxisBottom: React.FC<AxisBottom> = ({
   xScale,
   yScale,
   width,
+  height,
   tickOffset = 3,
   isDollarValue = false,
 }) => {
@@ -32,8 +34,18 @@ export const AxisBottom: React.FC<AxisBottom> = ({
             x2={xScale(tick)}
           />
           <text dy=".71em" textAnchor="middle" y={tickOffset} x={xScale(tick)}>
-            {isDollarValue ? currencyFormatter.format(tick) : tick}
+            {isDollarValue ? currencyFormatter.format(tick) : `${tick}%`}
           </text>
+
+          {tick === 30 && (
+            <line
+              y1={height - 120}
+              y2={-(height - 120)}
+              x1={xScale(tick)}
+              x2={xScale(tick)}
+              stroke="red"
+            />
+          )}
         </g>
       ))}
     </>

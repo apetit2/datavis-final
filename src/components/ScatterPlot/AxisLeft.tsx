@@ -1,5 +1,4 @@
 import { ScaleLinear } from 'd3';
-import { currencyFormatter } from '../../util/currency';
 
 export interface AxisLeftProps {
   xScale: ScaleLinear<number, number, never>;
@@ -9,35 +8,43 @@ export interface AxisLeftProps {
   isDollarValue?: boolean;
 }
 
-export const AxisLeft: React.FC<AxisLeftProps> = ({
-  xScale,
-  yScale,
-  height,
-  tickOffset = 3,
-  isDollarValue = false,
-}) => {
-  const reversed = yScale.ticks().slice().reverse();
-
+export const AxisLeft: React.FC<AxisLeftProps> = ({ height }) => {
   return (
     <>
-      {reversed.map((tick) => (
-        <g
-          key={tick}
-          style={{ stroke: '#C0C0BB' }}
-          transform={`translate(${xScale.range()[1] / 2}, 0)`}
+      <defs>
+        <marker
+          id="arrowhead"
+          markerWidth="10"
+          markerHeight="7"
+          refX="0"
+          refY="3.5"
+          orient="auto"
         >
-          <line y1={0} y2={height} />
-          <line
-            x1={-tickOffset}
-            x2={tickOffset}
-            y1={yScale(tick)}
-            y2={yScale(tick)}
-          />
-          <text textAnchor="end" x={-tickOffset} y={yScale(tick)} dy=".32em">
-            {isDollarValue ? currencyFormatter.format(tick) : tick}
-          </text>
-        </g>
-      ))}
+          <polygon points="0 0, 10 3.5, 0 7" fill="#C0C0BB" />
+        </marker>
+      </defs>
+      <g>
+        <line
+          y1={height / 2}
+          y2={0}
+          stroke="#C0C0BB"
+          markerEnd="url(#arrowhead)"
+        />
+        <text x="0" y="-10%" textAnchor="middle">
+          higher wage
+        </text>
+      </g>
+      <g>
+        <line
+          y1={height / 2}
+          y2={height}
+          stroke="#C0C0BB"
+          markerEnd="url(#arrowhead)"
+        />
+        <text x="0" y="85%" textAnchor="middle">
+          lower wage
+        </text>
+      </g>
     </>
   );
 };

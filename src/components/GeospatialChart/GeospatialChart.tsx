@@ -9,7 +9,6 @@ import { KeysMatching } from '../../types/shared';
 import ReactTooltip from 'react-tooltip';
 import { USMap } from '../../services/models/maps';
 import { feature } from 'topojson-client';
-import { useFetchStateData } from './hooks/useFetchStateData';
 import { useGeospatialChart } from './hooks/useGeospatialChart';
 import { usePanAndZoom } from './hooks/usePanAndZoom';
 import { Col, Row } from 'antd';
@@ -22,6 +21,8 @@ export interface GeospatialChartProps<T extends CSVRow> {
   stateField: KeysMatching<T, string | undefined>;
   colorRepresentation: KeysMatching<T, number | undefined>;
   chosenTimeField: number;
+  data: USMap;
+  chosenState?: string;
   showLegend?: boolean;
   onMouseOver?: (event: MouseEvent<SVGPathElement>, state: string) => void;
   onClick?: (event: MouseEvent<SVGPathElement>, state: string) => void;
@@ -34,16 +35,16 @@ export const GeospatialChart = <T extends CSVRow>({
   rows,
   timeField,
   stateField,
+  data,
   colorRepresentation,
   chosenTimeField,
+  chosenState,
   showLegend = false,
   onMouseOver,
   onClick,
   renderToolTip,
 }: GeospatialChartProps<T>) => {
-  const [clicked, setClicked] = useState<string>();
   const [ref, setRef] = useState<SVGSVGElement | null>(null);
-  const { data, fallback } = useFetchStateData();
 
   useEffect(() => {
     ReactTooltip.rebuild();
@@ -57,10 +58,6 @@ export const GeospatialChart = <T extends CSVRow>({
     colorRepresentation as string,
     chosenTimeField
   );
-
-  if (fallback) {
-    return fallback;
-  }
 
   const generateScale = () => {
     if (width / 1.3 > 800) {
@@ -88,7 +85,9 @@ export const GeospatialChart = <T extends CSVRow>({
               data-tip={value.properties.name}
               data-for="states-tooltip"
               className={
-                clicked === value.properties.name ? 'state clicked' : 'state'
+                chosenState === value.properties.name
+                  ? 'state clicked'
+                  : 'state'
               }
               d={path(value) as string}
               stroke="black"
@@ -96,7 +95,6 @@ export const GeospatialChart = <T extends CSVRow>({
               key={`${value.properties.name}`}
               onClick={(event) => {
                 if (onClick) {
-                  setClicked(value.properties.name);
                   onClick(event, value.properties.name);
                 }
               }}

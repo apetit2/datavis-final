@@ -2,14 +2,16 @@
 
 ## Data
 
-For my final data visualization project, I will be presenting information on minimum wage and cost of living throughout the United States. Currently, I have one formatted dataset that provides minimum wage data for all 50 states as well as the 5 U.S owned territories since 1968. This dataset can be found [here](https://gist.github.com/apetit2/212a7cd715f8ba34eb637d014fffb12f). In addition, I have located additional data from the U.S Housing and Urban Development Department that provides average rent costs since the early 2000s. This data is provided free of charge at this [location](https://www.huduser.gov/portal/datasets/50per.html#null). This dataset can be found [here](https://gist.github.com/apetit2/aaa39169ab48ff313cfb2bfe12486fef).
+For my final data visualization project, I will be presenting information on minimum wage and cost of living throughout the United States. I am using two formatted datasets to create these visualizations.
+
+1. A modified dataset initially derived from one provided on [Kaggle](https://www.kaggle.com/lislejoem/us-minimum-wage-by-state-from-1968-to-2017) that provides minimum wage data for all 50 states as well as the 5 U.S owned territories since 1968. This dataset can be found [here](https://gist.github.com/apetit2/212a7cd715f8ba34eb637d014fffb12f). 
+2. A dataset from the U.S Housing and Urban Development Department that provides average rent costs since the early 2000s. This data is provided free of charge at this [location](https://www.huduser.gov/portal/datasets/50per.html#null). This dataset can be found [here](https://gist.github.com/apetit2/aaa39169ab48ff313cfb2bfe12486fef).
 
 ---
 
 ## Prototypes
-As an initial POC, I have created a few visualizations to help demonstrate the direction I hope to take this project.
+All prototypes for this project can be found on github pages in the provided links below:
 
-Links:
 * [Final Project](https://apetit2.github.io/datavis-final/#/minimum-wage)
 
 ---
@@ -31,8 +33,8 @@ Another prototype I created for this project is a highly configurable line chart
 ![Min. Wage Line Chart (Single)](./img/single-state-line.png)*figure 4: Minimum Wage Line Chart (Single)*
 ![Min. Wage Line Chart (All)](./img/all-states-line.png)*figure 5: Minimum Wage Line Chart (All)*
 
-### Min. Wage vs. Rent Cost Scatter Plot
-Another prototype I created for this project is a highly configurable scatter plot that can be used to show minimum wage rates for each distinctive state as it pertains to rent costs for that state. Currently there is a slider that can be used to cycle through years: 2001-2020. Like the geospatial chart prototype, the year can be auto incremented by toggling on the auto-increment switch. Moreover, a tooltip provides additional information by hovering over a circle in the chart (each circle represents a unique territory or state). Future modifications will add an additional menu item to choose between rent types (ie. studio, 1BR apartment, 2BR apartment, 3BR apartment, and 4BR apartments). I will also attempt to include additional context on other living expenses for a state. 
+### Min. Wage vs. Rent as a Percent of Salary Scatter Plot
+Another prototype I created for this project is a highly configurable scatter plot that can be used to show minimum wage rates for each state plotted against rent as a percent of a person's salary. There is a red line on the chart that highlights what most financial advisors believe is the highest percent of a person's salary they should spend on rent, 30% of their gross salary. Currently there is a slider that can be used to cycle through years: 2001-2020. Like the geospatial chart prototype, the year can be auto incremented by toggling on the auto-increment switch. Moreover, a tooltip provides additional information by hovering over a circle in the chart (each circle represents a unique territory or state). Future modifications will add an additional menu item to choose between rent types (ie. studio, 1BR apartment, 2BR apartment, 3BR apartment, and 4BR apartments).
 ![Min. Wage vs. Rent Cost Scatter Plot](./img/scatter-plot.png)*figure 6: Minimum Wage VS. Rent Cost Scatter Plot*
 
 ---

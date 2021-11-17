@@ -30,7 +30,7 @@ export interface ScatterPlotProps<T extends CSVRow> {
   isXAxisDollarValue?: boolean;
   isYAxisDollarValue?: boolean;
   circleText?: (val: string) => string;
-  renderToolTip?: (x: number, y: number, color: string) => ReactElement;
+  renderToolTip?: (row: T | undefined, color: string) => ReactElement;
 }
 
 export const ScatterPlot = <T extends CSVRow>({
@@ -130,12 +130,8 @@ export const ScatterPlot = <T extends CSVRow>({
     );
   }, [yAxisLabelOffset, paddedHeight, yLabel]);
 
-  const findFieldByValue = (value: string): { x: number; y: number } => {
-    const tmp = data.find((el) => (el[color!] as string) === value);
-
-    return tmp
-      ? { x: tmp[x!] as number, y: tmp[y!] as number }
-      : { x: 0, y: 0 };
+  const findFieldByValue = (value: string): T | undefined => {
+    return data.find((el) => (el[color!] as string) === value);
   };
 
   return (
@@ -148,6 +144,7 @@ export const ScatterPlot = <T extends CSVRow>({
             xScale={xScale}
             yScale={yScale}
             width={paddedWidth}
+            height={paddedHeight}
             tickOffset={10}
             isDollarValue={isXAxisDollarValue}
           />
@@ -207,8 +204,8 @@ export const ScatterPlot = <T extends CSVRow>({
           place="top"
           effect="solid"
           getContent={(val) => {
-            const xAndY = findFieldByValue(val);
-            return renderToolTip(xAndY.x, xAndY.y, val);
+            const row = findFieldByValue(val);
+            return renderToolTip(row, val);
           }}
         />
       )}

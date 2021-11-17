@@ -1,14 +1,12 @@
-import { CSVRow } from '../services/models/shared';
-import { DSVParsedArray } from 'd3-dsv';
 import { Loading } from '../components/Loading/Loading';
 import { Typography } from 'antd';
 
 const { Text } = Typography;
 
-export const useFallback = <T extends CSVRow>(
+export const useFallback = (
   isLoading: boolean,
   isError: boolean,
-  data?: DSVParsedArray<T>
+  data: boolean
 ) => {
   let fallback = null;
 
