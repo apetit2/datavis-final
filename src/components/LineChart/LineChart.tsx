@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/no-array-index-key */
 import {
   DSVParsedArray,
@@ -12,6 +13,7 @@ import {
 } from 'd3';
 import {
   PropsWithChildren,
+  ReactElement,
   useCallback,
   useEffect,
   useMemo,
@@ -24,6 +26,7 @@ import { AxisLeft } from './AxisLeft';
 import { CSVRow } from '../../services/models/shared';
 import { KeysMatching } from '../../types/shared';
 import { AnimatedGroup } from '../AnimatedGroup';
+import ReactTooltip from 'react-tooltip';
 
 export interface LineChartProps<T extends CSVRow> {
   filter?: (row: T) => boolean;
@@ -41,6 +44,7 @@ export interface LineChartProps<T extends CSVRow> {
   stroke?: string;
   focusable?: boolean;
   cords?: { x: number; y: number }[];
+  renderToolTip?: (row: T | undefined, color: string) => ReactElement;
 }
 
 const xAxisLabelOffset = 50;
@@ -115,6 +119,7 @@ export const LineChart = <T extends CSVRow>({
   stroke,
   focusable = true,
   cords,
+  renderToolTip,
 }: PropsWithChildren<LineChartProps<T>>) => {
   const [brushExtent, setBrushExtent] = useState<[number, number]>();
   const brushRef = useRef<SVGGElement>(null);
@@ -250,86 +255,107 @@ export const LineChart = <T extends CSVRow>({
     return undefined;
   }, [data, grouping, filter, focusable]);
 
+  const findFieldByValue = (value: string): T | undefined => {
+    return data.find((el) => (el[grouping!] as string) === value);
+  };
+
   return (
-    <svg
-      width={width}
-      height={focusable ? height + height * brushedSectionSize + 50 : height}
-    >
-      <g transform={`translate(${marginsForAxes.left},${marginsForAxes.top})`}>
-        <AxisBottom xScale={xScale} height={paddedHeight} tickOffset={10} />
-
-        <text
-          className="axis-label"
-          textAnchor="middle"
-          transform={`translate(${-yAxisLabelOffset},${
-            paddedHeight / 2
-          }) rotate(-90)`}
+    <>
+      <svg
+        width={width}
+        height={focusable ? height + height * brushedSectionSize + 50 : height}
+      >
+        <g
+          transform={`translate(${marginsForAxes.left},${marginsForAxes.top})`}
         >
-          {yLabel}
-        </text>
+          <AxisBottom xScale={xScale} height={paddedHeight} tickOffset={10} />
 
-        <AxisLeft yScale={yScale} width={paddedWidth} tickOffset={5} />
-
-        {!focusable && (
           <text
             className="axis-label"
-            x={paddedWidth / 2}
-            y={paddedHeight + xAxisLabelOffset}
             textAnchor="middle"
+            transform={`translate(${-yAxisLabelOffset},${
+              paddedHeight / 2
+            }) rotate(-90)`}
           >
-            {xLabel}
+            {yLabel}
           </text>
-        )}
 
-        <AnimatedGroup>
-          {lines.map((toDrawLine) => (
-            <path
-              key={toDrawLine[0][grouping]}
-              d={drawLines(toDrawLine)!}
-              stroke={stroke || colorScale(colorValue(toDrawLine[0]))}
-              strokeWidth={strokeWidth}
-              opacity={opacity}
-              fill="none"
-            />
-          ))}
-          {cords &&
-            cords.map(({ x: cordX, y: cordY }) => (
-              <circle
-                key={`cord-${cordX}-${cordY}`}
-                cx={xScale(cordX)}
-                cy={yScale(cordY)}
-                fill="red"
-                opacity="0.4"
-                r={8}
+          <AxisLeft yScale={yScale} width={paddedWidth} tickOffset={5} />
+
+          {!focusable && (
+            <text
+              className="axis-label"
+              x={paddedWidth / 2}
+              y={paddedHeight + xAxisLabelOffset}
+              textAnchor="middle"
+            >
+              {xLabel}
+            </text>
+          )}
+
+          <AnimatedGroup>
+            {lines.map((toDrawLine) => (
+              <path
+                data-tip={(toDrawLine[0] as any)[grouping]}
+                data-for="line-tooltip"
+                key={toDrawLine[0][grouping]}
+                d={drawLines(toDrawLine)!}
+                stroke={stroke || colorScale(colorValue(toDrawLine[0]))}
+                strokeWidth={strokeWidth}
+                opacity={opacity}
+                fill="none"
               />
             ))}
-        </AnimatedGroup>
-      </g>
-      {focusable && (
-        <AnimatedGroup
-          ref={brushRef}
-          transform={`translate(${marginsForAxes.left}, ${
-            height + margin.bottom + margin.top - brushedSectionHeight
-          })`}
-        >
-          <AxisBottom
-            xScale={focusXScale}
-            height={brushedSectionHeight}
-            tickOffset={10}
-          />
-
-          {focusLines?.map((toDrawLine) => (
-            <path
-              key={toDrawLine[0][grouping]}
-              d={drawFocus(toDrawLine)!}
-              stroke={stroke || colorScale(colorValue(toDrawLine[0]))}
-              strokeWidth={strokeWidth}
-              opacity={opacity}
-              fill="none"
+            {cords &&
+              cords.map(({ x: cordX, y: cordY }) => (
+                <circle
+                  key={`cord-${cordX}-${cordY}`}
+                  cx={xScale(cordX)}
+                  cy={yScale(cordY)}
+                  fill="red"
+                  opacity="0.4"
+                  r={8}
+                />
+              ))}
+          </AnimatedGroup>
+        </g>
+        {focusable && (
+          <AnimatedGroup
+            ref={brushRef}
+            transform={`translate(${marginsForAxes.left}, ${
+              height + margin.bottom + margin.top - brushedSectionHeight
+            })`}
+          >
+            <AxisBottom
+              xScale={focusXScale}
+              height={brushedSectionHeight}
+              tickOffset={10}
             />
-          ))}
-        </AnimatedGroup>
+
+            {focusLines?.map((toDrawLine) => (
+              <path
+                key={toDrawLine[0][grouping]}
+                d={drawFocus(toDrawLine)!}
+                stroke={stroke || colorScale(colorValue(toDrawLine[0]))}
+                strokeWidth={strokeWidth}
+                opacity={opacity}
+                fill="none"
+              />
+            ))}
+          </AnimatedGroup>
+        )}
+      </svg>
+      {renderToolTip && (
+        <ReactTooltip
+          id="line-tooltip"
+          place="top"
+          effect="float"
+          getContent={(val) => {
+            const row = findFieldByValue(val);
+            return renderToolTip(row, val);
+          }}
+        />
       )}
-    </svg>
+    </>
   );
 };

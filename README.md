@@ -34,7 +34,7 @@ Another prototype I created for this project is a highly configurable line chart
 ![Min. Wage Line Chart (All)](./img/all-states-line.png)*figure 5: Minimum Wage Line Chart (All)*
 
 ### Min. Wage vs. Rent as a Percent of Salary Scatter Plot
-Another prototype I created for this project is a highly configurable scatter plot that can be used to show minimum wage rates for each state plotted against rent as a percent of a person's salary. There is a red line on the chart that highlights what most financial advisors believe is the highest percent of a person's salary they should spend on rent, 30% of their gross salary. Currently there is a slider that can be used to cycle through years: 2001-2020. Like the geospatial chart prototype, the year can be auto incremented by toggling on the auto-increment switch. Moreover, a tooltip provides additional information by hovering over a circle in the chart (each circle represents a unique territory or state). Future modifications will add an additional menu item to choose between rent types (ie. studio, 1BR apartment, 2BR apartment, 3BR apartment, and 4BR apartments).
+Another prototype I created for this project is a highly configurable scatter plot that can be used to show minimum wage rates for each state plotted against rent as a percent of a person's salary. There is a red line on the chart that highlights what most financial advisors believe is the highest percent of a person's salary they should spend on rent, 30% of their gross salary. Currently there is a slider that can be used to cycle through years: 2001-2020. Like the geospatial chart prototype, the year can be auto incremented by toggling on the auto-increment switch. Moreover, a tooltip provides additional information by hovering over a circle in the chart (each circle represents a unique territory or state). There is also a drop down to allow choosing between different rent types (ie. studio, 1BR apartment, 2BR apartment, 3BR apartment, and 4BR apartments).
 ![Min. Wage vs. Rent Cost Scatter Plot](./img/scatter-plot.png)*figure 6: Minimum Wage VS. Rent Cost Scatter Plot*
 
 ---
@@ -116,13 +116,13 @@ The above sketch depicts the initial sketch up of the geospatial chart I have si
     * ~~Could use react-move, or react-motion, but both require some additional optimization on some of the charts I made to prevent unnecessary re-renders~~
 * ~~Week of (11/3)~~
   * ~~Finish work on animations (11/3)~~
-  * Code clean up (11/5)
-  * Text clean up (11/5)
+  * ~~Code clean up (11/5)~~
+  * ~~Text clean up (11/5)~~
 * Week of (11/10)
   * Unit Tests (11/13)
-* Week of (11/17)
-  * Work on any remaining tasks that weren't finished in above time line (11/20)
-* Week of (11/24)
-  * Work on any remaining tasks that weren't finished in above time line (11/27)
+* ~~Week of (11/17)~~
+  * ~~Work on any remaining tasks that weren't finished in above time line (11/20)~~
+* ~~Week of (11/24)~~
+  * ~~Work on any remaining tasks that weren't finished in above time line (11/27)~~
 
 ---

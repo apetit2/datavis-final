@@ -4,7 +4,7 @@ import {
   GeospatialChart,
   YearSelector,
 } from '../../components/GeospatialChart';
-import { Button, Col, Divider, Row, Space, Switch, Typography } from 'antd';
+import { Button, Col, Divider, Row, Select, Space, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { Constants } from './constants';
@@ -31,6 +31,30 @@ export interface FinalVisPageProps {}
 
 const { Text } = Typography;
 
+const generateScatterPlotXAxisText = (
+  val:
+    | 'twoBedroomPercentOfRent'
+    | 'studioPercentOfRent'
+    | 'oneBedroomPercentOfRent'
+    | 'threeBedroomPercentOfRent'
+    | 'fourBedroomPercentOfRent'
+) => {
+  switch (val) {
+    case 'studioPercentOfRent':
+      return 'Studio';
+    case 'oneBedroomPercentOfRent':
+      return 'One Bedroom Apartment';
+    case 'twoBedroomPercentOfRent':
+      return 'Two Bedroom Apartment';
+    case 'threeBedroomPercentOfRent':
+      return 'Three Bedroom Apartment';
+    case 'fourBedroomPercentOfRent':
+      return 'Four Bedroom Apartment';
+    default:
+      return '';
+  }
+};
+
 export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
   const { data, isError, isLoading } = useMinimumWageQuery();
 
@@ -56,6 +80,13 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
   const [selectedScatterPlotYear, setSelectedScatterPlotYear] =
     useState(minScatterPlotYear);
   const [selectedState, setSelectedState] = useState('all');
+  const [selectedRent, setSelectedRent] = useState<
+    | 'twoBedroomPercentOfRent'
+    | 'studioPercentOfRent'
+    | 'oneBedroomPercentOfRent'
+    | 'threeBedroomPercentOfRent'
+    | 'fourBedroomPercentOfRent'
+  >('twoBedroomPercentOfRent');
 
   // line chart
   const [lineGraphX, setLineGraphX] =
@@ -63,7 +94,6 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
   const [lineGraphY, setLineGraphY] = useState<
     KeysMatching<MinimumWage, number | undefined>
   >('effectiveMinWageTodayDollars');
-  const [isFocusable, setIsFocusable] = useState(false);
 
   const filteredData = useMemo(() => {
     return data?.filter(
@@ -93,7 +123,9 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
     setSelectedScatterPlotYear
   );
 
-  const xAxisLabel = 'Two Bedroom Apartment Cost as a Percent of Earnings';
+  const xAxisLabel = `${generateScatterPlotXAxisText(
+    selectedRent
+  )} Cost as a Percent of Earnings`;
   const yAxisLabel = 'Minimum Wage ($/hour)';
 
   if (fallback || !data || !usMap || !filteredData) {
@@ -191,10 +223,6 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                   >
                     Reset
                   </Button>
-                  <Switch
-                    onChange={(val) => setIsFocusable(val)}
-                    checked={isFocusable}
-                  />
                 </Space>
                 <LineChartAxes<MinimumWage>
                   selectedX={lineGraphX}
@@ -243,7 +271,7 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                 yLabel={MinimumWageCols[lineGraphY]}
                 x={lineGraphX}
                 y={lineGraphY}
-                focusable={isFocusable}
+                focusable={false}
                 grouping="state"
                 cords={
                   selectedState !== 'all' &&
@@ -271,12 +299,19 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                 opacity=".4"
                 strokeWidth={3}
                 stroke={selectedState !== 'all' ? 'blue' : undefined}
+                renderToolTip={(minWage) => (
+                  <Space direction="vertical">
+                    <Text style={{ color: 'white' }}>
+                      State: {minWage?.state ?? ''}
+                    </Text>
+                  </Space>
+                )}
               />
             </Col>
           </Row>
           <Divider />
-          <Row style={{ width }} justify="center">
-            <Col style={{ width: '30%' }}>
+          <Row style={{ width }} justify="space-around">
+            <Col style={{ width: '45%' }}>
               <YearSelector
                 defaultYear={selectedScatterPlotYear}
                 minYear={minScatterPlotYear}
@@ -285,6 +320,29 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                 toggleIncrementYear={setShouldDisableScatterPlotAutoIncrement}
                 onChange={setSelectedScatterPlotYear}
               />
+            </Col>
+            <Col style={{ width: '45%' }}>
+              <Select
+                style={{ width: '100%' }}
+                value={selectedRent}
+                onChange={(val) => setSelectedRent(val)}
+              >
+                <Select.Option value="studioPercentOfRent">
+                  Studio
+                </Select.Option>
+                <Select.Option value="oneBedroomPercentOfRent">
+                  One Bedroom
+                </Select.Option>
+                <Select.Option value="twoBedroomPercentOfRent">
+                  Two Bedroom
+                </Select.Option>
+                <Select.Option value="threeBedroomPercentOfRent">
+                  Three Bedroom
+                </Select.Option>
+                <Select.Option value="fourBedroomPercentOfRent">
+                  Four Bedroom
+                </Select.Option>
+              </Select>
             </Col>
           </Row>
           <Row style={{ width }}>
@@ -296,11 +354,10 @@ export const FinalVisPage: React.FC<FinalVisPageProps> = () => {
                 data={filteredData}
                 xLabel={xAxisLabel}
                 yLabel={yAxisLabel}
-                x="twoBedroomPercentOfRent"
+                x={selectedRent}
                 y="stateMinWageTodayDollars"
                 color="state"
                 radius={12}
-                isYAxisDollarValue
                 opacity="0.4"
                 circleText={(state) => convertStateToAbbreviation(state)}
                 renderToolTip={(row, state) => (

@@ -8,7 +8,6 @@ import {
 } from 'd3';
 
 import { AxisBottom } from './AxisBottom';
-import { AxisLeft } from './AxisLeft';
 import { CSVRow } from '../../services/models/shared';
 import { KeysMatching } from '../../types/shared';
 import { AnimatedGroup } from '../AnimatedGroup';
@@ -28,7 +27,6 @@ export interface ScatterPlotProps<T extends CSVRow> {
   data: DSVParsedArray<T>;
   opacity?: string;
   isXAxisDollarValue?: boolean;
-  isYAxisDollarValue?: boolean;
   circleText?: (val: string) => string;
   renderToolTip?: (row: T | undefined, color: string) => ReactElement;
 }
@@ -46,7 +44,6 @@ export const ScatterPlot = <T extends CSVRow>({
   data,
   opacity = '.3',
   isXAxisDollarValue,
-  isYAxisDollarValue,
   circleText,
   renderToolTip,
 }: PropsWithChildren<ScatterPlotProps<T>>) => {
@@ -150,14 +147,6 @@ export const ScatterPlot = <T extends CSVRow>({
           />
 
           {yAxisLabel}
-
-          <AxisLeft
-            xScale={xScale}
-            yScale={yScale}
-            height={paddedHeight}
-            tickOffset={5}
-            isDollarValue={isYAxisDollarValue}
-          />
 
           <text
             className="axis-label"
