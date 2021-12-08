@@ -13,6 +13,7 @@ For my final data visualization project, I will be presenting information on min
 All prototypes for this project can be found on github pages in the provided link below:
 
 * [Final Project](https://apetit2.github.io/datavis-final/#/minimum-wage)
+* [Final Project Video](https://youtu.be/1XQubWy6P_E)
 
 ---
 
